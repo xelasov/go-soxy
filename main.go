@@ -37,7 +37,7 @@ func main() {
 	latch.Wait()
 }
 
-func copyWithDelay(size int64, delay time.Duration, from net.Conn, to net.Conn, mon *sync.WaitGroup) {
+func copyWithDelay(size int64, delay time.Duration, from io.ReadCloser, to io.WriteCloser, mon *sync.WaitGroup) {
 	defer mon.Done()
 
 	for {

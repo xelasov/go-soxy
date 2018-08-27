@@ -6,7 +6,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -18,7 +17,6 @@ func main() {
 	fatalErr(err)
 	defer ln.Close()
 
-	latch := sync.WaitGroup{}
 	for {
 		locConn, err := ln.Accept()
 		fatalErr(err)
@@ -27,18 +25,13 @@ func main() {
 		remConn, err := net.Dial("tcp", opts.remAddr)
 		fatalErr(err)
 
-		latch.Add(2)
-
-		go copyWithDelay(opts.pktSize, opts.delay, locConn, remConn, &latch)
-		go copyWithDelay(opts.pktSize, opts.delay, remConn, locConn, &latch)
+		go copyWithDelay(opts.pktSize, opts.delay, locConn, remConn)
+		go copyWithDelay(opts.pktSize, opts.delay, remConn, locConn)
 
 	}
-
-	latch.Wait()
 }
 
-func copyWithDelay(size int64, delay time.Duration, from io.ReadCloser, to io.WriteCloser, mon *sync.WaitGroup) {
-	defer mon.Done()
+func copyWithDelay(size int64, delay time.Duration, from io.ReadCloser, to io.WriteCloser) {
 
 	for {
 		_, err := io.CopyN(to, from, size)

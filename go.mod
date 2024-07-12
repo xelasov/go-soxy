@@ -1,3 +1,3 @@
-module bitbucket.org/xelasov/soxy
+module github.com/xelasov/go-soxy
 
-go 1.12
+go 1.22
